@@ -1,0 +1,100 @@
+# NOTE: update this with your service name
+service: serverless-notes-api
+
+# Create an optimized package for our functions 
+# package:
+#   individually: true
+
+plugins:
+  - serverless-bundle # Package our functions with Webpack
+  - serverless-offline
+  - serverless-dotenv-plugin # Load .env as environment variables
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-east-2
+  # To load environment variables externally
+  # rename env.example to .env and uncomment
+  # the following line. Also, make sure to not
+  # commit your .env.
+  #
+  environment:
+    NOTES_TABLE: ${env:NOTES_TABLE}
+    NOTES_BUCKET: ${env:NOTES_BUCKET}
+
+functions:
+  # hello:
+  #   handler: handler.hello
+  #   events:
+  #     - http:
+  #         path: hello
+  #         method: get
+
+  createNotes:
+    handler: src/lamda/http/createNote.handler
+    events:
+      - http:
+          path: notes
+          cors: true
+          method: post
+
+resources:
+  Resources:
+    NotesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AtrributeName: userId
+          - AttributeType: S
+          - AtrributeName: noteId
+          - AttributeType: S
+        KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+            - AttributeName: todoId
+              KeyType: RANGE
+          BillingMode: PAY_PER_REQUEST
+          TableName: ${self:provider.environment.NOTES_TABLE}
+          # GlobalSecondaryIndexes:
+          #   - IndexName: ${self:provider.environment.TODO_USER_INDEX}
+          #     KeySchema:
+          #       - AttributeName: userId
+          #         KeyType: HASH
+          #     Projection:
+          #       ProjectionType: ALL
+
+    NotesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.NOTES_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - "*"
+              AllowedHeaders:
+                - "*"
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              ExposeHeaders:  
+              MaxAge: 3000
+    BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: MyPolicy
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: "*"
+              Action:
+                - s3:GetObject
+                - s3:PutObject
+              Resource: "arn:aws:s3:::${self:provider.environment.NotesBucket}/*"
+        Bucket: !Ref AttachmentsBucket
