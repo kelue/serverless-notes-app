@@ -1,5 +1,5 @@
 import handlers from "../../helpers/handlerLib"
-import * as uuid from "uuid"
+import * as uuid from "uuid/dist"
 import dynamoDb  from "../../helpers/dynamoDb"
 import * as middy from "middy"
 import { cors, httpErrorHandler } from "middy/middlewares"
@@ -7,7 +7,7 @@ import { cors, httpErrorHandler } from "middy/middlewares"
 export const handler = middy( handlers(async (event) => {
     
   const data = JSON.parse(event.body);
-  const user = "123"
+  const user = event.requestContext.identity.cognitoIdentityId
   const params = {
     TableName: process.env.NOTES_TABLE,
     Item: {
