@@ -9,7 +9,7 @@ DynamoDb
 S3 bucket
 Amazon cognito
 
-# Serverless TypeScript Starter [![Seed Status](https://api.seed.run/serverless-stack/serverless-typescript-starter/stages/prod/build_badge)](https://console.seed.run/serverless-stack/serverless-typescript-starter)
+# Serverless TypeScript Starter (https://console.seed.run/serverless-stack/serverless-typescript-starter)
 
 A Serverless starter that adds TypeScript, serverless-offline, linting, environment variables, and unit test support.
 
