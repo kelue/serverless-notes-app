@@ -5,6 +5,7 @@ import { cors, httpErrorHandler } from "middy/middlewares"
 
 
 export const handler = middy (handlers(async (event) => {
+    const user = event.requestContext.identity.cognitoIdentityId
   const params = {
     TableName: process.env.NOTES_TABLE,
     // 'KeyConditionExpression' defines the condition for the query
@@ -14,7 +15,7 @@ export const handler = middy (handlers(async (event) => {
     // 'ExpressionAttributeValues' defines the value in the condition
     // - ':userId': defines 'userId' to be the id of the author
     ExpressionAttributeValues: {
-      ":userId": "123",
+      ":userId": user,
     },
   };
 
